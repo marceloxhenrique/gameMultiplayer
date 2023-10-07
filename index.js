@@ -18,9 +18,8 @@ function createGame() {
 
     const keyPressed = command.keyPressed;
     const player = state.players.player1;
-    console.log(player);
 
-    if (keyPressed === "ArrowUp" && player.y > 0) {
+    if ((keyPressed === "ArrowUp" || keyPressed === "z") && player.y > 0) {
       player.y--;
       return;
     }
@@ -38,27 +37,47 @@ function createGame() {
       player.x--;
       return;
     }
-    if (keyPressed === "a" && player.x > 0 && player.y > 0) {
-      player.x--;
-      player.y--;
-      return;
-    }
   }
   return { movePlayer, state };
 }
 
 const game = createGame();
 
-document.addEventListener("keydown", handleKeyDown);
+const keyboardListener = createKeyboardListener();
+keyboardListener.subscribe(game.movePlayer);
 
-function handleKeyDown(e) {
-  const keyPressed = e.key;
-
-  const command = {
-    playerId: "player1",
-    keyPressed,
+function createKeyboardListener() {
+  const state = {
+    observers: [],
   };
-  game.movePlayer(command);
+
+  function subscribe(observersFunction) {
+    state.observers.push(observersFunction);
+  }
+
+  function notifyAll(command) {
+    console.log(`Notifying ${state.observers.length} observers`);
+    for (const observersFunction of state.observers) {
+      observersFunction(command);
+    }
+  }
+
+  document.addEventListener("keydown", handleKeyDown);
+
+  function handleKeyDown(e) {
+    const keyPressed = e.key;
+
+    const command = {
+      playerId: "player1",
+      keyPressed,
+    };
+
+    notifyAll(command);
+  }
+
+  return {
+    subscribe,
+  };
 }
 
 renderScreen();
