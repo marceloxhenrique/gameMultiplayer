@@ -1,15 +1,10 @@
-const canvas = document.querySelector("canvas");
-const ctx = canvas.getContext("2d");
-
-const currentPlayerId = "player1";
-function createGame() {
+export default function createGame() {
   const state = {
-    players: {
-      // player1: { y: 1, x: 1 },
-      // player2: { y: 3, x: 9 },
-    },
-    fruits: {
-      // fruit1: { y: 1, x: 3 },
+    players: {},
+    fruits: {},
+    canvas: {
+      width: 10,
+      height: 10,
     },
   };
 
@@ -53,12 +48,12 @@ function createGame() {
         }
       },
       ArrowRight(player) {
-        if (player.x < 9) {
+        if (player.x < state.canvas.width - 1) {
           player.x++;
         }
       },
       ArrowDown(player) {
-        if (player.y < 9) {
+        if (player.y < state.canvas.height - 1) {
           player.y++;
         }
       },
@@ -100,70 +95,4 @@ function createGame() {
     addFruit,
     removefruit,
   };
-}
-
-const game = createGame();
-
-const keyboardListener = createKeyboardListener();
-keyboardListener.subscribe(game.movePlayer);
-
-game.addPlayer({ playerId: "player1", playerX: 0, playerY: 0 });
-game.addPlayer({ playerId: "player2", playerX: 5, playerY: 5 });
-game.addPlayer({ playerId: "player3", playerX: 6, playerY: 3 });
-game.addFruit({ fruitId: "fruit1", fruitX: 3, fruitY: 3 });
-game.addFruit({ fruitId: "fruit2", fruitX: 4, fruitY: 8 });
-
-function createKeyboardListener() {
-  const state = {
-    observers: [],
-  };
-
-  function subscribe(observersFunction) {
-    state.observers.push(observersFunction);
-  }
-
-  function notifyAll(command) {
-    // console.log(`Notifying ${state.observers.length} observers`);
-    for (const observersFunction of state.observers) {
-      observersFunction(command);
-    }
-  }
-
-  document.addEventListener("keydown", handleKeyDown);
-
-  function handleKeyDown(e) {
-    const keyPressed = e.key;
-
-    const command = {
-      playerId: "player1",
-      keyPressed,
-    };
-
-    notifyAll(command);
-  }
-
-  return {
-    subscribe,
-  };
-}
-
-renderScreen();
-
-function renderScreen() {
-  ctx.fillStyle = "white";
-  ctx.clearRect(0, 0, 10, 10);
-
-  for (const playerId in game.state.players) {
-    const player = game.state.players[playerId];
-    ctx.fillStyle = "black";
-    ctx.fillRect(player.x, player.y, 1, 1);
-  }
-
-  for (const fruitId in game.state.fruits) {
-    const fruit = game.state.fruits[fruitId];
-    ctx.fillStyle = "green";
-    ctx.fillRect(fruit.x, fruit.y, 1, 1);
-  }
-
-  requestAnimationFrame(renderScreen);
 }

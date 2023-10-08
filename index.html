@@ -12,11 +12,12 @@
       margin: 0;
     }
 
-    main {
+    body {
       display: flex;
       justify-content: center;
       align-items: center;
       width: 100vw;
+      max-width: 100%;
       height: 100vh;
     }
 
@@ -32,11 +33,24 @@
 </head>
 
 <body>
-  <main>
-    <canvas id="canvas" width="10" height="10">
-    </canvas>
-  </main>
-  <script src="index.js"></script>
+  <canvas id="canvas" width="10" height="10"></canvas>
+  <script type="module">
+    import createGame from "./game.js"
+    import createKeyboardListener from "./keyboardListener.js"
+    import renderScreen from "./renderScreen.js"
+
+    const game = createGame();
+    const keyboardListener = createKeyboardListener(document);
+    keyboardListener.subscribe(game.movePlayer);
+
+    const canvas = document.querySelector("canvas");
+    renderScreen(canvas, game, requestAnimationFrame)
+    game.addPlayer({ playerId: "player1", playerX: 0, playerY: 0 });
+    game.addPlayer({ playerId: "player2", playerX: 5, playerY: 5 });
+    game.addPlayer({ playerId: "player3", playerX: 6, playerY: 3 });
+    game.addFruit({ fruitId: "fruit1", fruitX: 3, fruitY: 3 });
+    game.addFruit({ fruitId: "fruit2", fruitX: 4, fruitY: 8 });
+  </script>
 </body>
 
 </html>
