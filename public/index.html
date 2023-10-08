@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/socket.io/socket.io.js"></script>
   <title>Document</title>
   <style>
     * {
@@ -45,11 +46,12 @@
 
     const canvas = document.querySelector("canvas");
     renderScreen(canvas, game, requestAnimationFrame)
-    game.addPlayer({ playerId: "player1", playerX: 0, playerY: 0 });
-    game.addPlayer({ playerId: "player2", playerX: 5, playerY: 5 });
-    game.addPlayer({ playerId: "player3", playerX: 6, playerY: 3 });
-    game.addFruit({ fruitId: "fruit1", fruitX: 3, fruitY: 3 });
-    game.addFruit({ fruitId: "fruit2", fruitX: 4, fruitY: 8 });
+
+    const socket = io();
+    socket.on("connect", () => {
+      const playId = socket.id
+      console.log(`Player connected on client with id: ${playId}`)
+    })
   </script>
 </body>
 
