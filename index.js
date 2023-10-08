@@ -79,7 +79,6 @@ function createGame() {
   }
 
   const checkForFruitCollision = (playerId) => {
-    // for (const playerId in state.players) {
     const player = state.players[playerId];
     for (const fruitId in state.fruits) {
       const fruit = state.fruits[fruitId];
@@ -90,7 +89,7 @@ function createGame() {
         console.log(`Colilssion in square ${(fruit.x, fruit.y)}`);
       }
     }
-    // }
+    //
   };
 
   return {
