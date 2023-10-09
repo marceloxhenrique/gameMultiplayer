@@ -13,7 +13,6 @@ export default function createKeyboardListener(document) {
   }
 
   function notifyAll(command) {
-    // console.log(`Notifying ${state.observers.length} observers`);
     for (const observersFunction of state.observers) {
       observersFunction(command);
     }
@@ -25,6 +24,7 @@ export default function createKeyboardListener(document) {
     const keyPressed = e.key;
 
     const command = {
+      type: "move-player",
       playerId: state.playerId,
       keyPressed,
     };

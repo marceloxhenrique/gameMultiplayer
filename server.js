@@ -13,6 +13,7 @@ const port = 3000;
 app.use(express.static("public"));
 
 const game = createGame();
+game.start();
 
 game.subscribe((command) => {
   console.log(`> Emmiting ${command.type}`);
@@ -31,6 +32,13 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     game.removePlayer({ playerId });
     console.log(`Player ${playerId} disconnected`);
+  });
+
+  socket.on("move-player", (command) => {
+    command.playerId = playerId;
+    command.type = "move-player";
+
+    game.movePlayer(command);
   });
 });
 

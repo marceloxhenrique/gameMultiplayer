@@ -9,12 +9,17 @@ export default function createGame() {
   };
   const observers = [];
 
+  function start() {
+    const frequency = 2000;
+
+    setInterval(addFruit, frequency);
+  }
+
   function subscribe(observersFunction) {
     observers.push(observersFunction);
   }
 
   function notifyAll(command) {
-    // console.log(`Notifying ${state.observers.length} observers`);
     for (const observersFunction of observers) {
       observersFunction(command);
     }
@@ -59,22 +64,41 @@ export default function createGame() {
   };
 
   const addFruit = (command) => {
-    const { fruitId, fruitY, fruitX } = command;
+    const fruitId = command
+      ? command.fruitId
+      : Math.floor(Math.random() * 10000000);
+    const fruitX = command
+      ? command.fruitX
+      : Math.floor(Math.random() * state.canvas.width);
+    const fruitY = command
+      ? command.fruitY
+      : Math.floor(Math.random() * state.canvas.height);
 
     state.fruits[fruitId] = {
-      y: fruitY,
       x: fruitX,
+      y: fruitY,
     };
+
+    notifyAll({
+      type: "add-fruit",
+      fruitId: fruitId,
+      fruitX: fruitX,
+      fruitY: fruitY,
+    });
   };
 
-  const removefruit = (command) => {
-    const fruitsId = command.fruitId;
+  const removeFruit = (command) => {
+    const fruitId = command.fruitId;
 
-    delete state.fruits[fruitsId];
+    delete state.fruits[fruitId];
+    notifyAll({
+      type: "remove-fruit",
+      fruitId: fruitId,
+    });
   };
 
   function movePlayer(command) {
-    // console.log(`Moving ${command.playerId} with ${command.keyPressed}`);
+    notifyAll(command);
 
     const acceptedMoves = {
       ArrowUp(player) {
@@ -115,7 +139,7 @@ export default function createGame() {
       console.log(`Checking ${playerId} and ${fruitId}`);
 
       if (fruit.y === player.y && fruit.x === player.x) {
-        removefruit({ fruitId });
+        removeFruit({ fruitId });
         console.log(`Colilssion in square ${(fruit.x, fruit.y)}`);
       }
     }
@@ -128,8 +152,9 @@ export default function createGame() {
     addPlayer,
     removePlayer,
     addFruit,
-    removefruit,
+    removeFruit,
     setState,
     subscribe,
+    start,
   };
 }
