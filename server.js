@@ -1,29 +1,39 @@
 import express from "express";
-import { createServer } from "http";
+import { createServer } from "node:http";
 import { Server } from "socket.io";
+
 import createGame from "./public/game.js";
 
 const app = express();
 const server = createServer(app);
-const sockets = new Server(server);
+const io = new Server(server);
+
 const port = 3000;
 
 app.use(express.static("public"));
 
 const game = createGame();
-game.addPlayer({ playerId: "player1", playerX: 0, playerY: 0 });
-game.addPlayer({ playerId: "player2", playerX: 5, playerY: 5 });
-game.addPlayer({ playerId: "player3", playerX: 6, playerY: 3 });
-game.addFruit({ fruitId: "fruit1", fruitX: 3, fruitY: 3 });
-game.addFruit({ fruitId: "fruit2", fruitX: 4, fruitY: 8 });
-game.movePlayer({ playerId: "player1", keyPressed: "ArrowRight" });
-console.log(game.state);
 
-sockets.on("connection", (socket) => {
-  const playId = socket.id;
-  console.log(`> PLayer connected on Server with id: ${playId}`);
+game.subscribe((command) => {
+  console.log(`> Emmiting ${command.type}`);
+  io.emit(command.type, command);
 });
 
-app.listen(port, () => {
-  console.log(`Server listening in port ${port}`);
+io.on("connection", (socket) => {
+  const playerId = socket.id;
+  console.log(`A player connected on server with the id: ${playerId}`);
+
+  game.addPlayer({ playerId: playerId });
+
+  console.log(game.state);
+  socket.emit("setup", game.state);
+
+  socket.on("disconnect", () => {
+    game.removePlayer({ playerId });
+    console.log(`Player ${playerId} disconnected`);
+  });
+});
+
+server.listen(port, () => {
+  console.log(`server running at http://localhost:${3000}`);
 });

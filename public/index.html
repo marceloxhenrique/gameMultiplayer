@@ -41,16 +41,35 @@
     import renderScreen from "./renderScreen.js"
 
     const game = createGame();
+
     const keyboardListener = createKeyboardListener(document);
-    keyboardListener.subscribe(game.movePlayer);
+
 
     const canvas = document.querySelector("canvas");
     renderScreen(canvas, game, requestAnimationFrame)
 
     const socket = io();
     socket.on("connect", () => {
-      const playId = socket.id
-      console.log(`Player connected on client with id: ${playId}`)
+      const playerId = socket.id
+      console.log(`Player connected on client with id: ${playerId}`)
+    })
+    socket.on("setup", (state) => {
+      const playerId = socket.id;
+
+      game.setState(state)
+
+      keyboardListener.registerPlayerId(playerId);
+      keyboardListener.subscribe(game.movePlayer);
+    })
+
+    socket.on("add-player", (command) => {
+      console.log(`Receiving ${command.type} -> ${command.playerId}`)
+      game.addPlayer(command)
+    })
+    socket.on("remove-player", (command) => {
+      console.log(command)
+      console.log(`Receiving ${command.type} -> ${command.playerId}`)
+      game.removePlayer(command)
     })
   </script>
 </body>
